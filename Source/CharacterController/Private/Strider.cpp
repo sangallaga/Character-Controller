@@ -5,13 +5,21 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 AStrider::AStrider()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	bUseControllerRotationYaw = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	FirstPersonCamera->SetupAttachment(GetCapsuleComponent());
+	FirstPersonCamera->SetRelativeLocation(FVector(0.f, 0.f, 64.f));
+	FirstPersonCamera->bUsePawnControlRotation = true;
 }
 
 // Called when the game starts or when spawned
@@ -51,7 +59,7 @@ void AStrider::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-// Called to translate player's current location (MoveAction Triggered)
+// Called to translate player's current location restricted to a walking plane (MoveAction Triggered)
 void AStrider::Move(const FInputActionValue& Value)
 {
 	const FVector2D MovementVector = Value.Get<FVector2D>();
@@ -68,7 +76,7 @@ void AStrider::Move(const FInputActionValue& Value)
 	//RepLoc();
 }
 
-// Helper function to UE_LOG current location to dispaly
+// Helper function to UE_LOG current location to display
 void AStrider::RepLoc()
 {
 	FVector CurrentLocation = GetActorLocation();
@@ -85,6 +93,9 @@ void AStrider::Rotate(const FInputActionValue& Value)
 	const FVector2D RotateVector = Value.Get<FVector2D>();
 	AddControllerYawInput(RotateVector.X);
 	AddControllerPitchInput(RotateVector.Y);
+	UE_LOG(LogTemp, Warning, TEXT("Look: %s | ControlRot: %s"),
+		*Value.Get<FVector2D>().ToString(),
+		*GetControlRotation().ToString());
 }
 
 

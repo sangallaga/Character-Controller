@@ -9,6 +9,7 @@
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
+class UCameraComponent;
 
 UCLASS()
 class CHARACTERCONTROLLER_API AStrider : public ACharacter
@@ -38,6 +39,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> RotateAction;
+	
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* FirstPersonCamera;
 	
 	void Move(const FInputActionValue& Value);
 	
