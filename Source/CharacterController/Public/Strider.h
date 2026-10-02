@@ -10,6 +10,7 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 class UCameraComponent;
+class UStriderMovementComponent;
 
 UCLASS()
 class CHARACTERCONTROLLER_API AStrider : public ACharacter
@@ -18,7 +19,7 @@ class CHARACTERCONTROLLER_API AStrider : public ACharacter
 
 public:
 	// Sets default values for this character's properties
-	AStrider();
+	AStrider(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	// Called when the game starts or when spawned
@@ -40,14 +41,28 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> RotateAction;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> JumpAction;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> DashAction;
+	
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* FirstPersonCamera;
+	
+	UPROPERTY()
+	TObjectPtr<UStriderMovementComponent> StriderMovement;
 	
 	void Move(const FInputActionValue& Value);
 	
 	void Rotate(const FInputActionValue& Value);
 	
 	void RepLoc();
+	
+	void Dash(const FInputActionValue& Value);
+	
+	void StopDashing(const FInputActionValue& Value);
+	
 	
 
 };

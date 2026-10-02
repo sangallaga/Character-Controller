@@ -8,18 +8,28 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "StriderMovementComponent.h"
 
 // Sets default values
-AStrider::AStrider()
+
+AStrider::AStrider(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UStriderMovementComponent>(  // Reach into subclass ACharacter and replace "CharacterMovementComponentName"
+		ACharacter::CharacterMovementComponentName))									// with StriderMovementComponent
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationYaw = true;
-	GetCharacterMovement()->bOrientRotationToMovement = false;
+	
+	// Camera Setup
 	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCamera->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCamera->SetRelativeLocation(FVector(0.f, 0.f, 64.f));
 	FirstPersonCamera->bUsePawnControlRotation = true;
+	
+	// UStriderMovement Setup
+	StriderMovement = Cast<UStriderMovementComponent>(GetCharacterMovement()); // Cast default UCharacterMovement into StriderMovementComponent
+	check(StriderMovement); // Check nullptr isn't returned
+	StriderMovement->bOrientRotationToMovement = false;
 }
 
 // Called when the game starts or when spawned
@@ -55,6 +65,10 @@ void AStrider::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	{
 		EIC->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AStrider::Move);
 		EIC->BindAction(RotateAction, ETriggerEvent::Triggered, this, &AStrider::Rotate);
+		EIC->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EIC->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EIC->BindAction(DashAction, ETriggerEvent::Started, this, &AStrider::Dash);
+		EIC->BindAction(DashAction, ETriggerEvent::Completed, this, &AStrider::StopDashing);
 	}
 
 }
@@ -93,9 +107,19 @@ void AStrider::Rotate(const FInputActionValue& Value)
 	const FVector2D RotateVector = Value.Get<FVector2D>();
 	AddControllerYawInput(RotateVector.X);
 	AddControllerPitchInput(RotateVector.Y);
-	UE_LOG(LogTemp, Warning, TEXT("Look: %s | ControlRot: %s"),
-		*Value.Get<FVector2D>().ToString(),
-		*GetControlRotation().ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("Look: %s | ControlRot: %s"),
+	//	*Value.Get<FVector2D>().ToString(),
+	//	*GetControlRotation().ToString());
 }
 
+
+void AStrider::Dash(const FInputActionValue& Value)
+{
+	StriderMovement->bWantsToCharge = true;
+}
+
+void AStrider::StopDashing(const FInputActionValue& Value)
+{
+	StriderMovement->bWantsToCharge = false;
+}
 
