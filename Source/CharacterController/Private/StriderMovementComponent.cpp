@@ -8,7 +8,7 @@ void UStriderMovementComponent::UpdateCharacterStateBeforeMovement(float DeltaSe
 	Super::UpdateCharacterStateBeforeMovement(DeltaSeconds);
 	if (bWantsToCharge)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("MaxChargeTime: %f -> AccumCharge: %f"), MaxChargeTime, AccumulatedCharge);
+		UE_LOG(LogTemp, Warning, TEXT("MaxChargeTime: %f -> AccumCharge: %f"), MaxChargeTime, AccumulatedCharge);
 		if (AccumulatedCharge >= MaxChargeTime)
 		{
 			AccumulatedCharge = MaxChargeTime;
@@ -65,12 +65,12 @@ void UStriderMovementComponent::CalcVelocity(float DeltaTime, float Friction, bo
 {
 	if (bIsSliding && RemainingSlideTime > 0.0f)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Remaining Slide: %f"), RemainingSlideTime);
+		//UE_LOG(LogTemp, Display, TEXT("Remaining Slide: %f"), RemainingSlideTime);
 		Super::CalcVelocity(DeltaTime, 0.0f, bFluid, BrakingDeceleration);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT("[%s] NOT Sliding"), *UEnum::GetValueAsString(GetOwnerRole()), Friction);
+		//UE_LOG(LogTemp, Display, TEXT("[%s] NOT Sliding"), *UEnum::GetValueAsString(GetOwnerRole()), Friction);
 		Super::CalcVelocity(DeltaTime, Friction, bFluid, BrakingDeceleration);
 	}
 	
